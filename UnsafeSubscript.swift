@@ -11,6 +11,107 @@ prefix operator ¿ { }
 
 infix operator ¿ {associativity left precedence 160 }
 
+infix operator <-- {precedence 158 }
+
+infix operator -- {precedence 159 }
+
+func -- (subs:UnsafeSubscript,content:AnyObject?) -> (UnsafeSubscript,AnyObject?) {
+    return (subs,content)
+}
+
+func -- (subs:Int,content:AnyObject?) -> (UnsafeSubscript,AnyObject?) {
+    return UnsafeSubscript(values: [.Index(subs)]) -- content
+}
+
+func -- (subs:String,content:AnyObject?) -> (UnsafeSubscript,AnyObject?) {
+    return UnsafeSubscript(values: [.Key(subs)]) -- content
+}
+
+func <-- (inout object:AnyObject?,subsContent:(UnsafeSubscript,AnyObject?)) -> Void {
+    let subs = subsContent.0
+    let content:AnyObject? = subsContent.1
+    
+    if subs.values.count == 0 {
+        object = content
+    }else {
+        var values = subs.values
+        var firstValue = values.removeAtIndex(0)
+        var innerSubs = UnsafeSubscript(values: values)
+        
+        if object == nil {
+            var innerObject:AnyObject? = nil
+            innerObject <-- innerSubs -- content
+            
+            if innerObject != nil {
+                switch firstValue {
+                case .Index(0):
+                    object = [innerObject!] as AnyObject
+                case .Key(let key):
+                    object = [key:innerObject!] as AnyObject
+                default:
+                    break
+                }
+            }
+            
+        }else{
+            
+            switch firstValue {
+            case .Index(let index):
+                
+                var innerObject:AnyObject? = object ¿ index
+                
+                if innerObject == nil {
+                    if let array = object as? [AnyObject] {
+                        if array.count == index {
+                            var newObject:AnyObject? = nil
+                            newObject <-- innerSubs -- content
+                            
+                            if newObject != nil {
+                                var mutArray:[AnyObject] = array
+                                mutArray.append(newObject!)
+                                object = mutArray as AnyObject
+                            }
+                        }
+                    }
+                }else {
+                    innerObject <-- innerSubs -- content
+                    if innerObject != nil {
+                        var array = object as [AnyObject]
+                        array[index] = innerObject!
+                        object = array as AnyObject
+                    }
+                }
+                
+            case .Key(let key):
+                
+                var innerObject:AnyObject? = object ¿ key
+                
+                if innerObject == nil {
+                    if let dict = object as? [String:AnyObject] {
+                        var newObject:AnyObject? = nil
+                        newObject <-- innerSubs -- content
+                        
+                        if newObject != nil {
+                            var mutDict:[String:AnyObject] = dict
+                            mutDict[key] = newObject
+                            object = mutDict as AnyObject
+                        }
+                    }
+                }else {
+                    innerObject <-- innerSubs -- content
+                    if innerObject != nil {
+                        var dict = object as [String:AnyObject]
+                        dict[key] = innerObject
+                        object = dict as AnyObject
+                    }
+                }
+            }
+            
+        }
+    }
+    
+}
+
 prefix func ¿ (index:Int) -> UnsafeSubscript {
     return UnsafeSubscript(values: [UnsafeSubscript.Value.Index(index)])
 }
@@ -147,8 +248,20 @@ func UnsafeString<A>(object: A) -> String? {
     return object as? String
 }
 
-func UnsafeNumber<A>(object: A) -> Double? {
+func UnsafeToString(object:Int) -> String? {
+    return String(object)
+}
+
+func UnsafeToString(object:Double) -> String? {
+    return "\(object)"
+}
+
+func UnsafeDouble<A>(object: A) -> Double? {
     return object as? Double
+}
+
+func UnsafeInt<A>(object: A) -> Int? {
+    return object as? Int
 }
 
 func UnsafeDictionary<A>(object: A) -> Dictionary<String,AnyObject>? {
@@ -167,6 +280,5 @@ struct UnsafeSubscript {
     }
     
     let values:[Value]
-    
-    
+
 }
