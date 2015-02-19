@@ -31,6 +31,8 @@ func <-- (inout object:AnyObject?,subsContent:(UnsafeSubscript,AnyObject?)) -> V
     let subs = subsContent.0
     let content:AnyObject? = subsContent.1
     
+    //TODO: MAKE SURE SETTING NIL ON AN ARRAY ELEMENT DELETES THAT ELEMENT
+    
     if subs.values.count == 0 {
         object = content
     }else {
@@ -205,6 +207,8 @@ func ¿ (a:AnyObject?,key:String) -> AnyObject? {
 
 func ¿ (a:AnyObject?,s:UnsafeSubscript) -> AnyObject? {
     
+    
+    
     if s.values.count == 0 {
         return a
     }else{
@@ -214,7 +218,8 @@ func ¿ (a:AnyObject?,s:UnsafeSubscript) -> AnyObject? {
         case let array as [AnyObject]:
             switch first {
             case let .Index(index):
-                if array.count > index && index > 0 {
+                
+                if array.count > index && index >= 0 {
                     return array[index] ¿ UnsafeSubscript(values:values)
                 }else{
                     return nil
@@ -280,5 +285,25 @@ struct UnsafeSubscript {
     }
     
     let values:[Value]
-
+    
+    init(values:[Value]) {
+        self.values = values
+    }
+    
+    init?(_ rawValues:[AnyObject]) {
+        var val:[Value] = []
+        for raw in rawValues {
+            if let i = raw as? Int {
+                val.append(Value.Index(i))
+            }else if let s = raw as? String {
+                val.append(Value.Key(s))
+            }else {
+                return nil
+            }
+        }
+        
+        self.init(values: val)
+        
+    }
+    
 }
