@@ -250,7 +250,13 @@ func ¿<A,B> (a: A?, f: A -> B?) -> B? {
 }
 
 func UnsafeString<A>(object: A) -> String? {
-    return object as? String
+    if let objString = object as? String {
+        return objString
+    }else if let objNumber = object as? NSNumber {
+        return objNumber.stringValue
+    }else {
+        return nil
+    }
 }
 
 func UnsafeToString(object:Int) -> String? {
