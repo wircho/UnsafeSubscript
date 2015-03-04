@@ -31,7 +31,6 @@ func <-- (inout object:AnyObject?,subsContent:(UnsafeSubscript,AnyObject?)) -> V
     let subs = subsContent.0
     let content:AnyObject? = subsContent.1
     
-    //TODO: MAKE SURE SETTING NIL ON AN ARRAY ELEMENT DELETES THAT ELEMENT
     
     if subs.values.count == 0 {
         object = content
@@ -77,7 +76,11 @@ func <-- (inout object:AnyObject?,subsContent:(UnsafeSubscript,AnyObject?)) -> V
                     }
                 }else {
                     innerObject <-- innerSubs -- content
-                    if innerObject != nil {
+                    if innerObject == nil {
+                        var array = object as [AnyObject]
+                        array.removeAtIndex(index)
+                        object = array as AnyObject
+                    }else{
                         var array = object as [AnyObject]
                         array[index] = innerObject!
                         object = array as AnyObject
