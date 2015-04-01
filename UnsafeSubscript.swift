@@ -143,6 +143,7 @@ func ¿ (s:UnsafeSubscript,index:Int) -> UnsafeSubscript {
 func ¿ (s:UnsafeSubscript,key:String) -> UnsafeSubscript {
     
     return UnsafeSubscript(values: s.values + (¿key).values)
+    
 }
 
 func ¿ (s:UnsafeSubscript,t:UnsafeSubscript) -> UnsafeSubscript {
