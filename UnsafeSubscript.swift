@@ -296,6 +296,14 @@ struct UnsafeSubscript {
     
     let values:[Value]
     
+    init(_ rawValue:String) {
+        self.values = [Value.Key(rawValue)]
+    }
+    
+    init(_ rawValue:Int) {
+        self.values = [Value.Index(rawValue)]
+    }
+    
     init(values:[Value]) {
         self.values = values
     }
