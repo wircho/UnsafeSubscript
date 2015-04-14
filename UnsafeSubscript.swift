@@ -77,11 +77,11 @@ func <-- (inout object:AnyObject?,subsContent:(UnsafeSubscript,AnyObject?)) -> V
                 }else {
                     innerObject <-- innerSubs -- content
                     if innerObject == nil {
-                        var array = object as [AnyObject]
+                        var array = object as! [AnyObject]
                         array.removeAtIndex(index)
                         object = array as AnyObject
                     }else{
-                        var array = object as [AnyObject]
+                        var array = object as! [AnyObject]
                         array[index] = innerObject!
                         object = array as AnyObject
                     }
@@ -105,7 +105,7 @@ func <-- (inout object:AnyObject?,subsContent:(UnsafeSubscript,AnyObject?)) -> V
                 }else {
                     innerObject <-- innerSubs -- content
                     if innerObject != nil {
-                        var dict = object as [String:AnyObject]
+                        var dict = object as! [String:AnyObject]
                         dict[key] = innerObject
                         object = dict as AnyObject
                     }
