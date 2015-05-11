@@ -272,11 +272,11 @@ func UnsafeToString(object:Double) -> String? {
 }
 
 func UnsafeDouble<A>(object: A) -> Double? {
-    return object as? Double
+    return (object as? Double) ?? (object as? NSString)?.doubleValue
 }
 
 func UnsafeInt<A>(object: A) -> Int? {
-    return object as? Int
+    return (object as? Int) ?? (object as? NSString)?.integerValue
 }
 
 func UnsafeDictionary<A>(object: A) -> Dictionary<String,AnyObject>? {
